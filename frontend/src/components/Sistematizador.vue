@@ -149,7 +149,7 @@ const loadGrados = async () => {
     loadingGrados.value = true;
     try {
         grados.value = await desempenosService.getGrados();
-        if (grados.value.length > 0 && !selectedGradoId.value) {
+        if (grados.value.length > 0 && !selectedGradoId.value && grados.value[0]) {
             selectedGradoId.value = grados.value[0].id;
         }
     } catch (e) {
@@ -735,11 +735,12 @@ watch(activeTab, (newTab) => {
                                 </td>
 
                                 <template v-for="(nivel, key) in niveles" :key="key">
-                                    <td v-for="(preg, idx) in nivel.preguntas" :key="idx"
+                                    <td v-for="(_pregunta, idx) in nivel.preguntas" :key="idx"
                                         class="p-1 border-r border-slate-100 dark:border-slate-700 text-center">
                                         <select :value="est.respuestas[String(key)]?.[idx] || ''" @change="(e) => {
                                             if (!est.respuestas[String(key)]) est.respuestas[String(key)] = [];
-                                            est.respuestas[String(key)][idx] = (e.target as HTMLSelectElement).value;
+                                            const respArray = est.respuestas[String(key)];
+                                            if (respArray) respArray[idx] = (e.target as HTMLSelectElement).value;
                                         }"
                                             class="w-full text-center bg-transparent outline-none cursor-pointer focus:bg-indigo-50 dark:focus:bg-indigo-900/20 rounded py-1">
                                             <option value="">-</option>
@@ -1002,7 +1003,7 @@ watch(activeTab, (newTab) => {
                                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                     <tr v-for="(est, i) in estudiantes" :key="i">
                                         <td class="p-2 text-slate-700 dark:text-slate-300">{{ est.nombre || 'Sin Nombre'
-                                            }}</td>
+                                        }}</td>
                                         <td class="p-2 text-center">
                                             <span v-if="est.nivelFinal"
                                                 class="px-2 py-0.5 rounded text-[10px] font-bold uppercase" :class="{
